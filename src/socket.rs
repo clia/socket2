@@ -827,6 +827,16 @@ impl Socket {
         sys::set_timeout_opt(self.inner, sys::SOL_SOCKET, sys::SO_RCVTIMEO, duration)
     }
 
+    /// Set value for the `SO_RCVTIMEO` option on this socket.
+    ///
+    /// If `timeout` is `None`, then `read` and `recv` calls will block
+    /// indefinitely.
+    pub fn set_user_timeout(&self, timeout: usize) -> io::Result<()> {
+        const SOL_TCP: c_int = 6 as c_int;
+        const TCP_USER_TIMEOUT: c_int = 18 as c_int;
+        unsafe { setsockopt(self.inner, SOL_TCP, TCP_USER_TIMEOUT, timeout as c_int) }
+    }
+
     /// Get the value of the `SO_REUSEADDR` option on this socket.
     ///
     /// For more information about this option, see [`set_reuse_address`].
